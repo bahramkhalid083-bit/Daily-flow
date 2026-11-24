@@ -1,0 +1,632 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1020">
+<title>DailyFlow | Your Daily Planner</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #0b1020;
+  color: #f1f5f9;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1050px;
+  margin: auto;
+  padding: 25px 18px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.logo {
+  font-size: 27px;
+  font-weight: bold;
+  color: #8b9cff;
+}
+
+.logo span {
+  color: #fff;
+}
+
+.date {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.welcome {
+  margin-bottom: 25px;
+}
+
+.welcome h1 {
+  font-size: 27px;
+  margin-bottom: 8px;
+}
+
+.welcome p {
+  color: #94a3b8;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 25px;
+}
+
+.card, .panel {
+  background: #151d32;
+  border: 1px solid #26324b;
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.stat-label {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.stat-number {
+  font-size: 27px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.progress-track {
+  height: 9px;
+  background: #28344c;
+  border-radius: 20px;
+  margin-top: 14px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #818cf8;
+  border-radius: 20px;
+  transition: width .3s;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.panel {
+  margin-bottom: 18px;
+}
+
+.panel h2 {
+  font-size: 19px;
+  margin-bottom: 17px;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+input {
+  min-width: 0;
+  flex: 1;
+  background: #0b1325;
+  border: 1px solid #34415d;
+  color: white;
+  padding: 12px;
+  border-radius: 9px;
+  outline: none;
+  font-size: 14px;
+}
+
+input:focus {
+  border-color: #818cf8;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  border-radius: 9px;
+  padding: 11px 14px;
+  background: #6366f1;
+  color: white;
+  font-weight: bold;
+}
+
+button:active {
+  opacity: .8;
+}
+
+.task, .schedule-item, .habit {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background: #0e172a;
+  padding: 12px;
+  border-radius: 9px;
+  margin-bottom: 9px;
+  border: 1px solid #25314a;
+  overflow-wrap: anywhere;
+}
+
+.task-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.task input[type="checkbox"],
+.habit input[type="checkbox"] {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  accent-color: #818cf8;
+}
+
+.completed {
+  text-decoration: line-through;
+  color: #64748b;
+}
+
+.delete {
+  background: #7f3044;
+  padding: 7px 10px;
+  font-size: 12px;
+  flex: none;
+}
+
+.small-input {
+  width: 100%;
+  margin-bottom: 9px;
+}
+
+.empty {
+  color: #64748b;
+  font-size: 13px;
+  text-align: center;
+  padding: 15px;
+}
+
+.schedule-time {
+  color: #a5b4fc;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.habit {
+  cursor: pointer;
+}
+
+.habit label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  cursor: pointer;
+}
+
+footer {
+  text-align: center;
+  color: #64748b;
+  padding: 20px;
+  font-size: 12px;
+}
+
+@media(max-width: 650px) {
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome h1 {
+    font-size: 23px;
+  }
+
+  .container {
+    padding: 20px 13px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+  <div class="logo">Daily<span>Flow.</span></div>
+  <div class="date" id="date"></div>
+</header>
+
+<section class="welcome">
+  <h1>Welcome back! 👋</h1>
+  <p>Make today productive. One task at a time.</p>
+</section>
+
+<section class="stats">
+
+  <div class="card">
+    <div class="stat-label">Total Tasks</div>
+    <div class="stat-number" id="total">0</div>
+  </div>
+
+  <div class="card">
+    <div class="stat-label">Completed</div>
+    <div class="stat-number" id="done">0</div>
+  </div>
+
+  <div class="card">
+    <div class="stat-label">Progress</div>
+    <div class="stat-number" id="percent">0%</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress"></div>
+    </div>
+  </div>
+
+</section>
+
+<div class="grid">
+
+  <!-- DAILY TASKS -->
+  <section class="panel">
+    <h2>✅ Daily Tasks</h2>
+
+    <div class="input-row">
+      <input id="taskInput" placeholder="Enter a new task...">
+      <button onclick="addTask()">Add</button>
+    </div>
+
+    <div id="taskList"></div>
+  </section>
+
+  <!-- STUDY TIMETABLE -->
+  <section class="panel">
+    <h2>📚 Study Timetable</h2>
+
+    <input id="subject" class="small-input"
+      placeholder="Subject or activity">
+
+    <input id="studyTime" class="small-input"
+      type="time">
+
+    <button onclick="addSchedule()" style="width:100%">
+      Add to timetable
+    </button>
+
+    <div id="scheduleList" style="margin-top:15px"></div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="panel">
+    <h2>📊 Your Progress</h2>
+    <p style="color:#94a3b8;font-size:14px">
+      Keep completing your daily tasks to make progress!
+    </p>
+
+    <div class="progress-track" style="height:14px">
+      <div class="progress-fill" id="bigProgress"></div>
+    </div>
+
+    <p id="progressText"
+       style="margin-top:12px;color:#a5b4fc;font-size:14px">
+       0% completed
+    </p>
+  </section>
+
+  <!-- HABIT TRACKER -->
+  <section class="panel">
+    <h2>🎯 Habit Tracker</h2>
+
+    <div class="input-row">
+      <input id="habitInput" placeholder="Add a new habit...">
+      <button onclick="addHabit()">Add</button>
+    </div>
+
+    <div id="habitList"></div>
+  </section>
+
+</div>
+
+</div>
+
+<footer>
+  DailyFlow © 2026 · Build good habits, one day at a time.
+</footer>
+
+<script>
+
+// DATE
+const today = new Date().toDateString();
+
+document.getElementById("date").textContent =
+  new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+
+// STORAGE
+function load(key, fallback = []) {
+  try {
+    const data = JSON.parse(localStorage.getItem(key));
+    return Array.isArray(data) ? data : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function save(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+let tasks = load("dailyflow_tasks");
+let schedule = load("dailyflow_schedule");
+let habits = load("dailyflow_habits");
+
+let habitDate = localStorage.getItem("dailyflow_habit_date");
+
+if (habitDate !== today) {
+  habits.forEach(h => h.done = false);
+  habitDate = today;
+  localStorage.setItem("dailyflow_habit_date", today);
+  save("dailyflow_habits", habits);
+}
+
+// TASKS
+function addTask() {
+  const input = document.getElementById("taskInput");
+  const value = input.value.trim();
+
+  if (!value) return;
+
+  tasks.push({
+    id: Date.now(),
+    name: value,
+    done: false
+  });
+
+  input.value = "";
+  save("dailyflow_tasks", tasks);
+  renderTasks();
+}
+
+function toggleTask(id) {
+  tasks = tasks.map(t =>
+    t.id === id ? {...t, done: !t.done} : t
+  );
+
+  save("dailyflow_tasks", tasks);
+  renderTasks();
+}
+
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  save("dailyflow_tasks", tasks);
+  renderTasks();
+}
+
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  list.innerHTML = "";
+
+  if (tasks.length === 0) {
+    list.innerHTML = '<div class="empty">No tasks yet. Add one!</div>';
+  }
+
+  tasks.forEach(t => {
+    const item = document.createElement("div");
+    item.className = "task";
+
+    const left = document.createElement("div");
+    left.className = "task-left";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = t.done;
+    checkbox.addEventListener("change", () => toggleTask(t.id));
+
+    const name = document.createElement("span");
+    name.textContent = t.name;
+    if (t.done) name.className = "completed";
+
+    left.append(checkbox, name);
+
+    const del = document.createElement("button");
+    del.className = "delete";
+    del.textContent = "Delete";
+    del.addEventListener("click", () => deleteTask(t.id));
+
+    item.append(left, del);
+    list.appendChild(item);
+  });
+
+  updateProgress();
+}
+
+// PROGRESS
+function updateProgress() {
+  const total = tasks.length;
+  const completed = tasks.filter(t => t.done).length;
+  const percentage = total
+    ? Math.round(completed / total * 100)
+    : 0;
+
+  document.getElementById("total").textContent = total;
+  document.getElementById("done").textContent = completed;
+  document.getElementById("percent").textContent = percentage + "%";
+  document.getElementById("progress").style.width = percentage + "%";
+  document.getElementById("bigProgress").style.width = percentage + "%";
+  document.getElementById("progressText").textContent =
+    percentage + "% of your tasks completed";
+}
+
+// TIMETABLE
+function addSchedule() {
+  const subject = document.getElementById("subject");
+  const time = document.getElementById("studyTime");
+
+  if (!subject.value.trim() || !time.value) {
+    alert("Please enter a subject and time!");
+    return;
+  }
+
+  schedule.push({
+    id: Date.now(),
+    name: subject.value.trim(),
+    time: time.value
+  });
+
+  schedule.sort((a,b) => a.time.localeCompare(b.time));
+
+  subject.value = "";
+  time.value = "";
+
+  save("dailyflow_schedule", schedule);
+  renderSchedule();
+}
+
+function deleteSchedule(id) {
+  schedule = schedule.filter(s => s.id !== id);
+  save("dailyflow_schedule", schedule);
+  renderSchedule();
+}
+
+function renderSchedule() {
+  const list = document.getElementById("scheduleList");
+  list.innerHTML = "";
+
+  if (schedule.length === 0) {
+    list.innerHTML = '<div class="empty">Your timetable is empty.</div>';
+  }
+
+  schedule.forEach(s => {
+    const item = document.createElement("div");
+    item.className = "schedule-item";
+
+    const info = document.createElement("div");
+
+    const title = document.createElement("div");
+    title.textContent = s.name;
+
+    const time = document.createElement("div");
+    time.className = "schedule-time";
+    time.textContent = new Date(
+      "2000-01-01T" + s.time
+    ).toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit"
+    });
+
+    info.append(title, time);
+
+    const del = document.createElement("button");
+    del.className = "delete";
+    del.textContent = "Delete";
+    del.addEventListener("click", () => deleteSchedule(s.id));
+
+    item.append(info, del);
+    list.appendChild(item);
+  });
+}
+
+// HABITS
+function addHabit() {
+  const input = document.getElementById("habitInput");
+  const value = input.value.trim();
+
+  if (!value) return;
+
+  habits.push({
+    id: Date.now(),
+    name: value,
+    done: false
+  });
+
+  input.value = "";
+  save("dailyflow_habits", habits);
+  renderHabits();
+}
+
+function toggleHabit(id) {
+  habits = habits.map(h =>
+    h.id === id ? {...h, done: !h.done} : h
+  );
+
+  save("dailyflow_habits", habits);
+  renderHabits();
+}
+
+function deleteHabit(id) {
+  habits = habits.filter(h => h.id !== id);
+  save("dailyflow_habits", habits);
+  renderHabits();
+}
+
+function renderHabits() {
+  const list = document.getElementById("habitList");
+  list.innerHTML = "";
+
+  if (habits.length === 0) {
+    list.innerHTML = '<div class="empty">Add your first habit!</div>';
+  }
+
+  habits.forEach(h => {
+    const item = document.createElement("div");
+    item.className = "habit";
+
+    const label = document.createElement("label");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = h.done;
+    checkbox.addEventListener("change", () => toggleHabit(h.id));
+
+    const name = document.createElement("span");
+    name.textContent = h.name;
+    if (h.done) name.className = "completed";
+
+    label.append(checkbox, name);
+
+    const del = document.createElement("button");
+    del.className = "delete";
+    del.textContent = "Delete";
+    del.addEventListener("click", () => deleteHabit(h.id));
+
+    item.append(label, del);
+    list.appendChild(item);
+  });
+}
+
+// INITIAL DISPLAY
+renderTasks();
+renderSchedule();
+renderHabits();
+
+</script>
+
+</body>
+</html>
